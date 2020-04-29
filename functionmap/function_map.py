@@ -11,8 +11,13 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QApplication, QHBoxLayout, QPu
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 
+from bordermap.border_map import BorderMapPart
+from propertymap.property_map import PropertyMapPart
+from functionmap.composed_image import ComposedImage
+
 
 class FunctionMapPart(QDialog):
+
     def __init__(self, parent=None):
         super(FunctionMapPart, self).__init__(parent)
         self.function_title_lb = QLabel()
@@ -21,6 +26,7 @@ class FunctionMapPart(QDialog):
         self.load_bd_image_bt = QPushButton()
         self.load_pp_image_bt = QPushButton()
         self.compose_bt = QPushButton()
+        self.a = []
         self.setupUI()
 
     def setupUI(self):
@@ -73,6 +79,7 @@ class FunctionMapPart(QDialog):
 
     def load_bd_image(self):
         file_name, _ = QFileDialog.getOpenFileName(self, '加载功能区边界定位图', '.', '图像文件(*.png, *.jpg)')
+        # print(file_name)  # 文件路径及文件名
         # self.image_label1.setPixmap(QPixmap(file_name).scaled(400, 300))
         self.image_lb1.setPixmap(QPixmap(file_name))
         self.image_lb1.setScaledContents(True)  # 让图片自适应label的大小
@@ -90,18 +97,18 @@ class FunctionMapPart(QDialog):
             else:
                 QMessageBox.about(self, '提示', '请先加载功能区属性定位图')
         else:
-            try:
-                result = self.image_lb2.pixmap()
+            print('执行合成函数，返回合成图片的路径')
+            path = r'C:/Users/xuyongchuan/Desktop/脑皮质.jpg'
+            composed_dialog = ComposedImage()
+            composed_dialog.show_composed_image(path=path)
+            composed_dialog.exec()
 
-                fname, ftype = QFileDialog.getSaveFileName(self, 'save file', './', '图像文件(*.png, *.jpg)')
-                if fname:
-                    result.save(fname)
-                    QMessageBox.information(self, '提示', '保存成功', QMessageBox.Yes)
-                else:
-                    QMessageBox.warning(self, '警告', '请输入正确的文件名', QMessageBox.Yes)
-
-            except IOError:
-                print('保存图片失败')
+    # 静态方法测试例
+    @staticmethod
+    def get(parent=None):
+        print('执行合成函数')
+        a = 666
+        return a
 
 
 if __name__ == '__main__':
@@ -109,3 +116,7 @@ if __name__ == '__main__':
     function_win = FunctionMapPart()
     function_win.show()
     sys.exit(function_app.exec_())
+
+
+
+

@@ -7,11 +7,12 @@
 import sys
 from PyQt5.QtWidgets import QDialog, QApplication, QHBoxLayout, QFileDialog, \
     QPushButton, QLabel, QVBoxLayout, QMessageBox
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 
 class PropertyMapPart(QDialog):
+    send_msg = pyqtSignal()
 
     def __init__(self, parent=None):  # 为什么被调用的类里面需要写parent=None参数
         super(PropertyMapPart, self).__init__(parent)
@@ -22,6 +23,7 @@ class PropertyMapPart(QDialog):
         self.show_image_bt = QPushButton()
         self.save_bt = QPushButton()
         self.setupUI()
+        self.pp_map_path = ''  # 保存生成的property路径
 
     def setupUI(self):
         self.resize(800, 600)
@@ -71,6 +73,9 @@ class PropertyMapPart(QDialog):
         self.setLayout(property_vlayout)
         # self.setCentralWidget()
 
+    def run(self):
+        self.send_msg.emit('hello pyqt5')
+
     def load_image(self):
         file_name, _ = QFileDialog.getOpenFileName(self, '选择皮质图片', '.', '图像文件(*.png, *.jpg)')
         # self.image_label1.setPixmap(QPixmap(file_name).scaled(400, 300))
@@ -96,6 +101,8 @@ class PropertyMapPart(QDialog):
                 if fname:
                     result.save(fname)
                     QMessageBox.information(self, '提示', '保存成功', QMessageBox.Yes)
+                    self.send_msg.emit('hello pyqt5')
+
                 else:
                     QMessageBox.warning(self, '警告', '请输入正确的文件名', QMessageBox.Yes)
 

@@ -78,19 +78,24 @@ class MainWindow(QMainWindow):
         main_frame.setLayout(v_layout)
         # 把widget窗口加载到主窗口的中央位置
         self.setCentralWidget(main_frame)
+        global dialog1, dialog2, dialog3
+        dialog1 = BorderMapPart()
+        dialog2 = PropertyMapPart()
+        dialog3 = FunctionMapPart()
+        dialog2.send_msg.connect(dialog3.get)
 
     def border_bt_clicked(self):
-        dialog1 = BorderMapPart(self)
+        # dialog1 = BorderMapPart(self)
         dialog1.exec()
         dialog1.destroy()
 
     def property_bt_clicked(self):
-        dialog2 = PropertyMapPart(self)
+        # dialog2 = PropertyMapPart(self)
         dialog2.exec()
         dialog2.destroy()
 
     def function_bt_clicked(self):
-        dialog3 = FunctionMapPart(self)
+        # dialog3 = FunctionMapPart(self)
         dialog3.exec()
         dialog3.destroy()
 
