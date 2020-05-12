@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('主窗口')
         self.resize(1000, 800)
 
-        self.mm_label = QLabel('ECoG脑功能定位临床应用软件')
+        self.mm_label = QLabel('ECoG+AL术中脑功能定位系统')
         self.mm_label.setAlignment(Qt.AlignCenter | Qt.AlignTop)
         self.mm_label.setStyleSheet('QLabel{color:rgb(0, 0, 0, 255);font-size:30px;font-weight:bold;font-family:Arial;}')
 

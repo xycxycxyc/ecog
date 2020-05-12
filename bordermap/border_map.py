@@ -4,9 +4,13 @@
 # @Author: xuyongchuan
 # @File  : border_map.py
 
-from PyQt5.QtWidgets import QMainWindow, QDialog, QApplication, QHBoxLayout, QPushButton, QWidget, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QApplication, QHBoxLayout, \
+    QPushButton, QWidget, QLabel, QVBoxLayout, QFileDialog
 import sys
 from PyQt5.QtCore import Qt
+from mne.io import read_raw_edf
+from mne.viz import plot_raw
+import numpy as np
 
 
 class BorderMapPart(QDialog):
@@ -18,6 +22,9 @@ class BorderMapPart(QDialog):
         self.border_lmr_bt = QPushButton()
         self.border_pm_bt = QPushButton()
         self.setupUI()
+        self.data_path = ''
+        self.pic_path = ''
+        self.raw_data = 0
 
     def setupUI(self):
         self.resize(800, 600)
@@ -44,8 +51,42 @@ class BorderMapPart(QDialog):
         border_vlayout.addStretch(1)
         self.setLayout(border_vlayout)
 
+        self.border_ld_bt.clicked.connect(self.load_data)
+        self.border_pp_bt.clicked.connect(self.preprocess)
+        self.border_lmr_bt.clicked.connect(self.recognize)
+        self.border_pm_bt.clicked.connect(self.paint_bd_map)
+
     def load_data(self):
-        pass
+        QMessageBox.information(self, '提示', '请先加载脑电数据', QMessageBox.Yes)
+        self.data_path, _ = QFileDialog.getOpenFileName(self, '加载脑电数据', '.', '脑电文件(*.edf)')
+
+        QMessageBox.information(self, '提示', '请加载皮质图片', QMessageBox.Yes)
+        self.pic_path, _ = QFileDialog.getOpenFileName(self, '加载皮质图片', '.', '图像文件(*.png, *.jpg)')
+
+        if self.data_path and self.pic_path:
+            print(self.data_path)
+            print(_)
+            self.raw_data = read_raw_edf(self.data_path)
+            print(self.raw_data)
+            QMessageBox.information(self, '消息', '数据加载完成', QMessageBox.Ok)
+        else:
+            if (not self.data_path) and (not self.pic_path):
+                print('数据未加载')
+            else:
+                if self.data_path:
+                    print('皮质图片未加载')
+                else:
+                    print('脑电数据未加载')
+
+    def preprocess(self):  # 预处理步骤：静息态数据截取->49-51Hz陷波滤波->ICA滤波
+        plot_raw(self.raw_data)
+        QMessageBox.information(self, '消息', '数据预处理完成', QMessageBox.Ok)
+
+    def recognize(self):
+        QMessageBox.information(self, '消息', '功能区识别完成', QMessageBox.Ok)
+
+    def paint_bd_map(self):
+        QMessageBox.information(self, '消息', '绘制功能区边界图完成', QMessageBox.Ok)
 
 
 if __name__ == '__main__':

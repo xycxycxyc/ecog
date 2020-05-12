@@ -62,14 +62,27 @@ class ComposedImage(QDialog):
 
     # 静态方法传参测试函数
     def testa(self):
-        fun = functionmap.function_map.FunctionMapPart()
-        a = fun.get()
+        # fun = functionmap.function_map.FunctionMapPart()
+        # fun.get1()
+        # a = fun.get()
+        a = functionmap.function_map.FunctionMapPart().get()
         print(a)
+
+    # 信号与槽传参测试
+    def process_fun(self):
+        fun = functionmap.function_map.FunctionMapPart()
+        fun.test_signal.connect(self.process)
+        fun.emit_test_signal()
+
+    def process(self, mystr, a, b):
+        print(mystr)
+        print(a+b)
 
 
 if __name__ == '__main__':
     composed_app = QApplication(sys.argv)
     composed_win = ComposedImage()
-    composed_win.testa()
+    # composed_win.testa()  # 静态方法传参测试
+    composed_win.process_fun()  #信号与槽传参测试
     composed_win.show()
     sys.exit(composed_app.exec_())

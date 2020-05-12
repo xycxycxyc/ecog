@@ -8,7 +8,7 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow, QDialog, QApplication, QHBoxLayout, QPushButton, \
     QWidget, QLabel, QVBoxLayout, QFileDialog, QMessageBox
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 from bordermap.border_map import BorderMapPart
@@ -17,6 +17,7 @@ from functionmap.composed_image import ComposedImage
 
 
 class FunctionMapPart(QDialog):
+    test_signal = pyqtSignal(str, int, int)
 
     def __init__(self, parent=None):
         super(FunctionMapPart, self).__init__(parent)
@@ -109,6 +110,10 @@ class FunctionMapPart(QDialog):
         print('执行合成函数')
         a = 666
         return a
+
+    # 信号与槽传参测试
+    def emit_test_signal(self):
+        self.test_signal.emit('hahhah', 4, 7)
 
 
 if __name__ == '__main__':
