@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 # @Time  :2020/5/12 11:37
 # @Author: xuyongchuan
-# @File  : workspaceUI.py
+# @File  : datapreprocessUI.py
 
 
 import sys
@@ -12,9 +12,9 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QMainWindow, QApplicat
     QRadioButton, QCheckBox, QStackedWidget, QFileDialog, QMessageBox
 
 
-class WorkSpaceUI_Info(QWidget):
+class DataPreprocessUI(QWidget):
     def __init__(self, parent=None):
-        super(WorkSpaceUI_Info, self).__init__(parent)
+        super(DataPreprocessUI, self).__init__(parent)
         self.show_data_path_lb = QLabel()
         self.show_preprocess_lb = QLabel()
         self.show_feature_lb = QLabel()
@@ -45,7 +45,7 @@ class WorkSpaceUI_Info(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    tree = WorkSpaceUI_Info()
+    tree = DataPreprocessUI()
     tree.show()
     tree.test()
     sys.exit(app.exec_())
