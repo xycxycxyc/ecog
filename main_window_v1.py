@@ -15,6 +15,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QHBoxLayout, \
     QGridLayout, QVBoxLayout, QPushButton, QStackedWidget, QFileDialog, QMessageBox
+import pymysql
 import qtawesome
 
 from tabUI.system_intro import SystemIntro
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent)
         self.title_lb = QPushButton()
         self.exit_bt = QPushButton()
+        self.logo_bt = QPushButton()
         self.main_widget = QWidget()
         self.main_layout = QVBoxLayout()
         self.left_widget = QWidget()
@@ -42,6 +44,9 @@ class MainWindow(QMainWindow):
         self.right_widget = QStackedWidget()
         self.mid_widget = QWidget()
         self.mid_layout = QHBoxLayout()
+        self.bottom_layout = QHBoxLayout()
+        self.bottom_widget = QWidget()
+        self.status_bar = QPushButton()
         # self.stack1 = QWidget()
 
         self.stack_system_intro = SystemIntro()
@@ -108,6 +113,7 @@ class MainWindow(QMainWindow):
         self.data_path = ''
         self.pic_path = ''
         self.border_pixmap = None
+        self.feature_sample = None
 
     def setupUI(self):
         self.resize(1000, 800)
@@ -124,6 +130,18 @@ class MainWindow(QMainWindow):
         "Helvetica Neue", Helvetica, Arial, sans-serif;}\
         QPushButton:hover{border-left:4px solid red;font-weight:700;}')
         self.exit_bt.clicked.connect(self.exit_bt_clicked)
+        self.logo_bt.setText('copyright@SCUT-BME-504')
+        self.logo_bt.setFixedSize(300, 30)
+        self.logo_bt.setStyleSheet('QPushButton{color:rgb(0, 0, 0, 255);border:none;font-size:15px;font-family: \
+        "Helvetica Neue", Helvetica, Arial, sans-serif;}\
+        QPushButton:hover{border-left:4px solid red;font-weight:700;}')
+
+        self.bottom_layout.addWidget(self.status_bar, alignment=Qt.AlignLeft)
+        self.bottom_layout.addWidget(self.logo_bt, alignment=Qt.AlignCenter)
+        self.bottom_layout.addWidget(self.exit_bt, alignment=Qt.AlignRight)
+
+        self.bottom_widget.setLayout(self.bottom_layout)
+
         self.stack_datapreprocessUI.setStyleSheet('QLabel{color:black;font-size:20px;font-family:Arial; \
          header:None}')
 
@@ -164,13 +182,15 @@ class MainWindow(QMainWindow):
 
         self.mid_layout.addWidget(self.left_widget, stretch=1)
         self.mid_layout.addWidget(self.right_widget, stretch=3)
+        self.mid_widget.setFixedSize(1000, 650)
         self.mid_layout.setSpacing(0)
         self.mid_widget.setLayout(self.mid_layout)
 
         self.main_widget.setObjectName('main_widget')
         self.main_layout.addWidget(self.title_lb, alignment=Qt.AlignCenter, stretch=1)  # 前两个参数是所在的行列，后两个参数是占用几行几列
         self.main_layout.addWidget(self.mid_widget, stretch=7)
-        self.main_layout.addWidget(self.exit_bt, alignment=Qt.AlignRight, stretch=1)
+        self.main_layout.addWidget(self.bottom_widget, stretch=1)
+        self.main_layout.setSpacing(0)
         # 设置窗口的样式
         main_widget_stylesheet = '''
             QWidget#main_widget{
@@ -206,7 +226,7 @@ class MainWindow(QMainWindow):
         '''
         self.main_widget.setStyleSheet(main_widget_stylesheet)
         self.setCentralWidget(self.main_widget)  # 一定要有要句代码，要不然主窗口不显示
-        self.setWindowOpacity(0.9)  # 设置窗口透明度
+        self.setWindowOpacity(1)  # 设置窗口透明度
         self.setAttribute(Qt.WA_TranslucentBackground)  # 设置窗口背景透明
         self.right_widget.setCurrentWidget(self.stack_system_intro)
         # self.setWindowFlag(Qt.FramelessWindowHint)  # 隐藏边框
@@ -218,25 +238,21 @@ class MainWindow(QMainWindow):
         self.right_widget.setCurrentWidget(self.stack_border_map_intro)
 
     def on_load_data_bt_clicked(self):
-        self.data_path, _ = QFileDialog.getOpenFileName(self, '加载脑电数据', '.', '脑电文件(*.edf)')
-        if self.data_path:
-            print(self.data_path)
-            print(_)
-            self.raw_data = read_raw_edf(self.data_path)
-            print(self.raw_data)
-            QMessageBox.information(self, '消息', '数据加载完成', QMessageBox.Ok)
-        else:
-            print('数据未加载')
-        self.stack_datapreprocessUI.show_data_path(self.data_path)
+
         self.right_widget.setCurrentWidget(self.stack_datapreprocessUI)
 
     def on_preprocessing_bt_clicked(self):
-        if not self.raw_data:
-            QMessageBox.information(self, '消息', '请先加载数据', QMessageBox.Ok)
+        self.feature_sample = self.stack_datapreprocessUI.feature_extract()
+        if self.feature_sample:
+            self.right_widget.setCurrentWidget(self.stack_datapreprocessUI)
         else:
-            self.stack_datapreprocessUI.show_preprocess()
+            if not self.raw_data:
+                QMessageBox.information(self, '消息', '请先加载数据', QMessageBox.Ok)
+            else:
+                self.feature_sample = self.stack_datapreprocessUI.feature_extract()
 
     def on_load_model_bt_clicked(self):
+        self.stack_clusterUI.get_feature_sample(self.feature_sample)
         self.right_widget.setCurrentWidget(self.stack_clusterUI)
 
     def on_load_pic_bt_clicked(self):
