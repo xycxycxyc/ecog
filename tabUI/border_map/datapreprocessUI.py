@@ -17,13 +17,16 @@ import pywt
 import pymysql
 from mne.io import read_raw_edf
 
+conn = pymysql.connect(host='127.0.0.1', user='root', passwd='xyc19950910', db='brain', port=3306,
+                       charset='utf8')
+
 
 class DataPreprocessUI(QWidget):
     def __init__(self, parent=None):
-        self.my_sql_dict = {'dy': 'select * from ecog where signal_id = "dy"',
-                       'wj' : 'select * from ecog where signal_id = "wj"',
-                       'ck' : 'select * from ecog where signal_id = "ck"'}
+        self.patient_id = ''
+        self.pic_path = ''
         self.data_path = ''
+        self.n_channels = 0
         self.raw_data = None
         self.static_signal = None
         self.feature_sample = []
@@ -32,7 +35,18 @@ class DataPreprocessUI(QWidget):
         self.patient_lb.setStyleSheet('QLabel{font-size:18px; font-family: \
         "Helvetica Neue", Helvetica, Arial, sans-serif;}')
         self.patient_cb = QComboBox()
-        self.patient_cb.addItems(['', 'dy', 'wj', 'ck'])
+
+        cur = conn.cursor()
+        sql = ' select signal_id from ecog '
+        cur.execute(sql)
+        conn.commit()
+
+        data = cur.fetchall()
+        mylist = []
+        for item in data:
+            mylist.append(item[0])
+
+        self.patient_cb.addItems([''] + mylist)
         self.patient_cb.setFixedSize(80, 30)
         self.patient_cb.setStyleSheet('QComboBox{font-size:18px; font-family: \
         "Helvetica Neue", Helvetica, Arial, sans-serif;}')
@@ -67,9 +81,9 @@ class DataPreprocessUI(QWidget):
         self.n_channels_lb = QLabel('导联数:')
         self.n_channels_lb.setStyleSheet('QLabel{font-size:18px; font-family: \
         "Helvetica Neue", Helvetica, Arial, sans-serif;}')
-        self.n_channels = QLineEdit()
-        self.n_channels.setReadOnly(True)
-        self.n_channels.setFixedSize(50, 30)
+        self.n_channels_QL = QLineEdit()
+        self.n_channels_QL.setReadOnly(True)
+        self.n_channels_QL.setFixedSize(50, 30)
 
         # self.end_time.setInputMask('0000')
 
@@ -97,7 +111,7 @@ class DataPreprocessUI(QWidget):
         upper_layout.addWidget(self.end_time_lb)
         upper_layout.addWidget(self.end_time)
         upper_layout.addWidget(self.n_channels_lb)
-        upper_layout.addWidget(self.n_channels)
+        upper_layout.addWidget(self.n_channels_QL)
         upper_widget.setLayout(upper_layout)
 
         lower_layout = QHBoxLayout()
@@ -128,24 +142,27 @@ class DataPreprocessUI(QWidget):
 
     def select_patient(self):
         patient_id = self.patient_cb.currentText()
-        my_sql_dict = {}
+        self.patient_id = patient_id
         try:
             print(11111111)
-            conn = pymysql.connect(host='127.0.0.1', user='root', passwd='xyc19950910', db='brain', port=3306,
-                                   charset='utf8')
             cur = conn.cursor()
             print(patient_id)
             print(type(patient_id))
-            # sql = 'select * from ecog where signal_id = "dy"'
-            sql = self.my_sql_dict[patient_id]
+
+            sql = 'select * from ecog where signal_id = "%s"' % patient_id
+            # result = cur.execute("select password from user where nickname = '%s' " % (username))
+
             print(sql)
             cur.execute(sql)
+            print('22222222')
             conn.commit()
             data = cur.fetchone()
+            print('data:', data)
             patient_data_path = data[1]
             static_start = data[2]
             static_end = data[3]
-            n_channels = data[4]
+            self.n_channels = data[4]
+            self.pic_path = data[5]
             cur.close()
             conn.close()
         except Exception as e:
@@ -158,13 +175,14 @@ class DataPreprocessUI(QWidget):
             self.raw_data = read_raw_edf(self.data_path, preload=True, stim_channel=None)
             self.raw_data.filter(1, 249)
             self.raw_data.notch_filter((50, 100, 150, 200))
-            # print(self.raw_data)
+            print(type(self.raw_data))
             QMessageBox.information(self, '消息', '数据加载完成', QMessageBox.Ok)
         else:
             print('数据未加载')
+        print('33333333333')
         self.start_time.setText(str(static_start))
         self.end_time.setText(str(static_end))
-        self.n_channels.setText(str(n_channels))
+        self.n_channels_QL.setText(str(self.n_channels))
 
     def get_static_signal(self):
         print(11111111)
@@ -255,6 +273,9 @@ class DataPreprocessUI(QWidget):
         self.show_loading_info_lb.append('特征提取:使用db3小波，六层小波分解，提取七个子频带的能量占比作为特征    完成！')
         print(self.feature_sample)
         return self.feature_sample
+
+    def trans_pic_path(self):
+        return self.pic_path
 
 
 if __name__ == '__main__':

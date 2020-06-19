@@ -34,6 +34,8 @@ from tabUI.function_map.generate_function_map import GenerateFunctionMap
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        self.patient_id = ''
+        self.result_list = []
         self.title_lb = QPushButton()
         self.exit_bt = QPushButton()
         self.logo_bt = QPushButton()
@@ -53,7 +55,7 @@ class MainWindow(QMainWindow):
         self.stack_border_map_intro = BorderMapIntro()
         self.stack_datapreprocessUI = DataPreprocessUI()
         self.stack_clusterUI = ClusterUI()
-        self.stack_loadpicUI = LoadElectrodePic()
+        self.stack_load_electrode_picUI = LoadElectrodePic()
         self.stack_generate_border_mapUI = GenerateBorderMap()
         self.stack_property_map_intro = PropertyMapIntro()
         self.stack_load_cortex_pic = LoadCortexPic()
@@ -112,7 +114,7 @@ class MainWindow(QMainWindow):
         self.raw_data = 0
         self.data_path = ''
         self.pic_path = ''
-        self.border_pixmap = None
+        self.border_pic_path = None
         self.feature_sample = None
 
     def setupUI(self):
@@ -172,7 +174,7 @@ class MainWindow(QMainWindow):
         self.right_widget.addWidget(self.stack_border_map_intro)
         self.right_widget.addWidget(self.stack_datapreprocessUI)
         self.right_widget.addWidget(self.stack_clusterUI)
-        self.right_widget.addWidget(self.stack_loadpicUI)
+        self.right_widget.addWidget(self.stack_load_electrode_picUI)
         self.right_widget.addWidget(self.stack_generate_border_mapUI)
         self.right_widget.addWidget(self.stack_property_map_intro)
         self.right_widget.addWidget(self.stack_load_cortex_pic)
@@ -256,11 +258,15 @@ class MainWindow(QMainWindow):
         self.right_widget.setCurrentWidget(self.stack_clusterUI)
 
     def on_load_pic_bt_clicked(self):
-        self.right_widget.setCurrentWidget(self.stack_loadpicUI)
+        self.pic_path = self.stack_datapreprocessUI.trans_pic_path()
+        self.stack_load_electrode_picUI.get_pic_path(self.pic_path)
+        self.right_widget.setCurrentWidget(self.stack_load_electrode_picUI)
 
     def on_generate_border_map_bt_clicked(self):
-        self.border_pixmap = self.stack_loadpicUI.get_pixmap()
-        self.stack_generate_border_mapUI.set_pixmap(self.border_pixmap)
+        self.stack_generate_border_mapUI.get_pic_path(self.pic_path)
+        self.result_list = self.stack_clusterUI.trans_result_list()
+
+        self.stack_generate_border_mapUI.get_result_list(self.result_list)
         self.right_widget.setCurrentWidget(self.stack_generate_border_mapUI)
 
     def on_property_map_bt_clicked(self):

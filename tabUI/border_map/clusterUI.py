@@ -23,6 +23,7 @@ class ClusterUI(QWidget):
         self.para_label = QLabel()
         self.cluster_result_lb = QTextEdit()
         self.cluster_result_lb.setReadOnly(True)
+        self.result_list = []
         self.setupUI()
 
     def setupUI(self):
@@ -52,6 +53,7 @@ class ClusterUI(QWidget):
     def cluster(self):
         # 层次聚类
         ac = AgglomerativeClustering(n_clusters=4, affinity="euclidean", linkage="ward")
+        print('self.feature_sample:', self.feature_sample)
 
         self.feature_sample[5][6] -= 0.2
         self.feature_sample[5][5] += 0.05
@@ -62,6 +64,7 @@ class ClusterUI(QWidget):
         self.feature_sample[2][4] += 0.06
 
         labels = ac.fit_predict(self.feature_sample)
+        self.result_list = labels
         print(labels)
         category1, category2, category3, category4 = [], [], [], []
         for i in range(len(self.feature_sample)):
@@ -88,13 +91,9 @@ class ClusterUI(QWidget):
             print(mystr1)
             self.cluster_result_lb.append(mystr1)
 
-        # self.cluster_result_lb.append('类别1：' + i for i in category1)
-        # self.cluster_result_lb.append('')
-        # self.cluster_result_lb.append('类别2：' + i for i in category2)
-        # self.cluster_result_lb.append('')
-        # self.cluster_result_lb.append('类别3：' + i for i in category3)
-        # self.cluster_result_lb.append('')
-        # self.cluster_result_lb.append('类别4：' + i for i in category4)
+    def trans_result_list(self):
+        print(self.result_list)
+        return self.result_list
 
 
 if __name__ == '__main__':

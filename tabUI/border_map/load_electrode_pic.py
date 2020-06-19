@@ -14,6 +14,7 @@ from PyQt5.QtGui import QPixmap
 class LoadElectrodePic(QWidget):
     def __init__(self, parent=None):
         super(LoadElectrodePic, self).__init__(parent)
+        self.pic_path = ''
         self.load_pic_button = QPushButton()
         self.pic_label = QLabel()
 
@@ -42,23 +43,20 @@ class LoadElectrodePic(QWidget):
         QPushButton#upload_button:hover{border-right:4px solid red;font-weight:700;}
         ''')
 
+    def get_pic_path(self, pic_path):
+        self.pic_path = pic_path
+        print(self.pic_path)
+
     def load_pic(self):
-        pic_path, _ = QFileDialog.getOpenFileName(self, '加载电极分布图片', '.', '图像文件(*.png, *.jpg)')
-        if pic_path:
-            print(pic_path)
-            self.pic_label.setPixmap(QPixmap(pic_path))
+
+        if self.pic_path:
+            self.pic_label.setPixmap(QPixmap(self.pic_path))
             self.pic_label.setScaledContents(True)  # 让图片自适应label的大小
 
             self.pic = self.pic_label.pixmap()
             QMessageBox.information(self, '消息', '电极分布图片加载完成', QMessageBox.Ok)
         else:
-            print('电极分布图片未加载')
-
-    def get_pixmap(self):
-        if self.pic_label.pixmap():
-            return self.pic_label.pixmap()
-        else:
-            QMessageBox.information(self, '消息', '请先导入电极分布图片', QMessageBox.Ok)
+            QMessageBox.information(self, '消息', '未找到电极分布图片', QMessageBox.Ok)
 
 
 if __name__ == '__main__':
