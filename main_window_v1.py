@@ -14,7 +14,7 @@ from mne.io import read_raw_edf
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QHBoxLayout, \
-    QGridLayout, QVBoxLayout, QPushButton, QStackedWidget, QFileDialog, QMessageBox
+    QGridLayout, QVBoxLayout, QPushButton, QStackedWidget, QFileDialog, QMessageBox, QStatusBar
 import pymysql
 import qtawesome
 
@@ -36,9 +36,11 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent)
         self.patient_id = ''
         self.result_list = []
+
         self.title_lb = QPushButton()
         self.exit_bt = QPushButton()
         self.logo_bt = QPushButton()
+
         self.main_widget = QWidget()
         self.main_layout = QVBoxLayout()
         self.left_widget = QWidget()
@@ -48,7 +50,8 @@ class MainWindow(QMainWindow):
         self.mid_layout = QHBoxLayout()
         self.bottom_layout = QHBoxLayout()
         self.bottom_widget = QWidget()
-        self.status_bar = QPushButton()
+        # self.status_bar = QPushButton()
+        # self.status_bar.set
         # self.stack1 = QWidget()
 
         self.stack_system_intro = SystemIntro()
@@ -75,40 +78,58 @@ class MainWindow(QMainWindow):
             '''QPushButton{background:#F7D674;border-radius:5px;}QPushButton:hover{background:yellow;}''')
         self.left_mini.setStyleSheet(
             '''QPushButton{background:#6DDF6D;border-radius:5px;}QPushButton:hover{background:green;}''')
-        self.left_label_1 = QPushButton("功能区边界定位图")
+        self.left_label_1 = QPushButton("功能区边界聚类算法")
+        self.left_label_1.clicked.connect(self.show_click_meg)
         self.left_label_1.clicked.connect(self.on_border_map_bt_clicked)
         self.left_label_1.setObjectName('left_label')
-        self.left_label_2 = QPushButton("功能区属性定位图")
+        self.left_label_2 = QPushButton("功能区属性分类算法")
+        self.left_label_2.clicked.connect(self.show_click_meg)
         self.left_label_2.clicked.connect(self.on_property_map_bt_clicked)
         self.left_label_2.setObjectName('left_label')
-        self.left_label_3 = QPushButton("功能区地形图")
+        self.left_label_3 = QPushButton("基于聚类和分类的定位算法")
+        self.left_label_3.clicked.connect(self.show_click_meg)
         self.left_label_3.clicked.connect(self.on_function_map_bt_clicked)
         self.left_label_3.setObjectName('left_label')
 
         self.left_button_1 = QPushButton(qtawesome.icon('fa.music', color='white'), "导入数据")
         self.left_button_1.clicked.connect(self.on_load_data_bt_clicked)
+        self.left_button_1.clicked.connect(self.show_click_meg)
         self.left_button_1.setObjectName('left_button')
         self.left_button_2 = QPushButton(qtawesome.icon('fa.sellsy', color='white'), "预处理及特征提取")
         self.left_button_2.clicked.connect(self.on_preprocessing_bt_clicked)
         self.left_button_2.setObjectName('left_button')
+        self.left_button_2.clicked.connect(self.show_click_meg)
         self.left_button_3 = QPushButton(qtawesome.icon('fa.film', color='white'), "模型加载与识别")
         self.left_button_3.clicked.connect(self.on_load_model_bt_clicked)
         self.left_button_3.setObjectName('left_button')
+        self.left_button_3.clicked.connect(self.show_click_meg)
+
         self.left_button_4 = QPushButton(qtawesome.icon('fa.home', color='white '), "导入电极分布图")
         self.left_button_4.clicked.connect(self.on_load_pic_bt_clicked)
         self.left_button_4.setObjectName('left_button')
+        self.left_button_4.clicked.connect(self.show_click_meg)
+
         self.left_button_5 = QPushButton(qtawesome.icon('fa.download', color='white'), "边界定位图")
         self.left_button_5.clicked.connect(self.on_generate_border_map_bt_clicked)
         self.left_button_5.setObjectName('left_button')
+        self.left_button_5.clicked.connect(self.show_click_meg)
+
         self.left_button_6 = QPushButton(qtawesome.icon('fa.heart', color='white'), "加载皮质图片")
         self.left_button_6.clicked.connect(self.on_load_cortex_bt_clicked)
         self.left_button_6.setObjectName('left_button')
+        self.left_button_6.clicked.connect(self.show_click_meg)
+
         self.left_button_7 = QPushButton(qtawesome.icon('fa.comment', color='white'), "属性定位图")
         self.left_button_7.clicked.connect(self.on_generate_property_map_bt_clicked)
         self.left_button_7.setObjectName('left_button')
+        self.left_button_7.clicked.connect(self.show_click_meg)
+
         self.left_button_8 = QPushButton(qtawesome.icon('fa.star', color='white'), "功能区地形图")
         self.left_button_8.clicked.connect(self.on_generate_function_map_bt_clicked)
         self.left_button_8.setObjectName('left_button')
+        self.left_button_8.clicked.connect(self.show_click_meg)
+
+        self.statusBar = QStatusBar()
 
         self.setupUI()
         self.raw_data = 0
@@ -119,10 +140,19 @@ class MainWindow(QMainWindow):
 
     def setupUI(self):
         self.resize(1000, 800)
-        self.setWindowTitle('ECoG+AL术中脑功能定位系统')
-        self.title_lb.setText('ECoG+AL术中脑功能定位系统')
+        self.setWindowTitle('基于静息态ECoG聚类和分类的术中脑功能定位系统')
+        self.title_lb.setText('基于静息态ECoG聚类和分类的术中脑功能定位系统')
+        # self.title_lb.setStyleSheet("QLabel{background-color:black; font-size:20px}")
+
+        self.setStatusBar(self.statusBar)
+        self.statusBar.setStyleSheet("QStatusBar{font-size:15px}")  # 调大状态栏的字体
+        # self.statusBar.setStyleSheet("QStatusBar{background-color:gray; font-size:20px}")  # 改状态栏的颜色与背景颜色一致
+        # self.statusBar.setVisible(True)  # 最下面额外增加一栏状态栏
+        self.statusBar.showMessage('就绪！')
         self.title_lb.clicked.connect(self.on_title_bt_clicked)
-        self.title_lb.setFixedSize(500, 70)
+        self.title_lb.clicked.connect(self.show_click_meg)
+
+        self.title_lb.setFixedSize(750, 70)
         self.title_lb.setStyleSheet('QPushButton{color:rgb(0, 0, 0, 255);border:none;font-size:30px;font-family: \
                 "Helvetica Neue", Helvetica, Arial, sans-serif;}\
                 QPushButton:hover{border-left:4px solid red;font-weight:700;}')
@@ -134,12 +164,15 @@ class MainWindow(QMainWindow):
         self.exit_bt.clicked.connect(self.exit_bt_clicked)
         self.logo_bt.setText('copyright@SCUT-BME-504')
         self.logo_bt.setFixedSize(300, 30)
+        self.logo_bt.clicked.connect(self.show_click_meg)
         self.logo_bt.setStyleSheet('QPushButton{color:rgb(0, 0, 0, 255);border:none;font-size:15px;font-family: \
         "Helvetica Neue", Helvetica, Arial, sans-serif;}\
         QPushButton:hover{border-left:4px solid red;font-weight:700;}')
 
-        self.bottom_layout.addWidget(self.status_bar, alignment=Qt.AlignLeft)
-        self.bottom_layout.addWidget(self.logo_bt, alignment=Qt.AlignCenter)
+        # self.bottom_layout.addWidget(self.status_bar, alignment=Qt.AlignLeft)
+        self.bottom_layout.addStretch(2)
+        self.bottom_layout.addWidget(self.logo_bt, alignment=Qt.AlignLeft)
+        self.bottom_layout.addStretch(1)
         self.bottom_layout.addWidget(self.exit_bt, alignment=Qt.AlignRight)
 
         self.bottom_widget.setLayout(self.bottom_layout)
@@ -189,7 +222,7 @@ class MainWindow(QMainWindow):
         self.mid_widget.setLayout(self.mid_layout)
 
         self.main_widget.setObjectName('main_widget')
-        self.main_layout.addWidget(self.title_lb, alignment=Qt.AlignCenter, stretch=1)  # 前两个参数是所在的行列，后两个参数是占用几行几列
+        self.main_layout.addWidget(self.title_lb, alignment=Qt.AlignCenter, stretch=1)
         self.main_layout.addWidget(self.mid_widget, stretch=7)
         self.main_layout.addWidget(self.bottom_widget, stretch=1)
         self.main_layout.setSpacing(0)
@@ -229,7 +262,9 @@ class MainWindow(QMainWindow):
         self.main_widget.setStyleSheet(main_widget_stylesheet)
         self.setCentralWidget(self.main_widget)  # 一定要有要句代码，要不然主窗口不显示
         self.setWindowOpacity(1)  # 设置窗口透明度
-        self.setAttribute(Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+
+        # self.setAttribute(Qt.WA_TranslucentBackground)  # 设置窗口背景透明  加上的话状态栏不显示。
+
         self.right_widget.setCurrentWidget(self.stack_system_intro)
         # self.setWindowFlag(Qt.FramelessWindowHint)  # 隐藏边框
 
@@ -240,11 +275,12 @@ class MainWindow(QMainWindow):
         self.right_widget.setCurrentWidget(self.stack_border_map_intro)
 
     def on_load_data_bt_clicked(self):
-
+        self.stack_datapreprocessUI.status_signal.connect(self.show_process_msg)
         self.right_widget.setCurrentWidget(self.stack_datapreprocessUI)
 
     def on_preprocessing_bt_clicked(self):
         self.feature_sample = self.stack_datapreprocessUI.feature_extract()
+        self.stack_datapreprocessUI.status_signal.connect(self.show_process_msg)
         if self.feature_sample:
             self.right_widget.setCurrentWidget(self.stack_datapreprocessUI)
         else:
@@ -255,6 +291,8 @@ class MainWindow(QMainWindow):
 
     def on_load_model_bt_clicked(self):
         self.stack_clusterUI.get_feature_sample(self.feature_sample)
+        self.stack_clusterUI.status_signal.connect(self.show_process_msg)
+
         self.right_widget.setCurrentWidget(self.stack_clusterUI)
 
     def on_load_pic_bt_clicked(self):
@@ -265,8 +303,10 @@ class MainWindow(QMainWindow):
     def on_generate_border_map_bt_clicked(self):
         self.stack_generate_border_mapUI.get_pic_path(self.pic_path)
         self.result_list = self.stack_clusterUI.trans_result_list()
-
         self.stack_generate_border_mapUI.get_result_list(self.result_list)
+
+        self.stack_generate_border_mapUI.status_signal.connect(self.show_process_msg)
+
         self.right_widget.setCurrentWidget(self.stack_generate_border_mapUI)
 
     def on_property_map_bt_clicked(self):
@@ -293,6 +333,13 @@ class MainWindow(QMainWindow):
         q_app = QApplication.instance()
         # 退出
         q_app.quit()
+
+    def show_click_meg(self):
+        sender = self.sender()
+        self.statusBar.showMessage(sender.text(), 3000)
+
+    def show_process_msg(self, msg):
+        self.statusBar.showMessage(msg)
 
 
 if __name__ == '__main__':

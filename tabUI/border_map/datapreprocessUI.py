@@ -8,7 +8,7 @@
 import sys
 import pandas as pd
 import numpy as np
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QMainWindow, QApplication, QWidget, QHBoxLayout, \
     QLabel, QListView, QListWidget, QGridLayout, QVBoxLayout, QPushButton, QFormLayout, QLineEdit, QComboBox, \
     QRadioButton, QCheckBox, QStackedWidget, QFileDialog, QMessageBox, QTextEdit
@@ -21,7 +21,25 @@ conn = pymysql.connect(host='127.0.0.1', user='root', passwd='xyc19950910', db='
                        charset='utf8')
 
 
+def show_status_decorator(func):
+    # from functools import wraps
+    #
+    # @wraps(func)
+    def decorated(self, *args, **kwargs):
+        print(22222222222)
+        self.status_signal.emit('testeststestestets')
+        print(self.status_signal)
+        print(3333333333333)
+        func(self, *args, **kwargs)
+        print(4444444444)
+        self.status_signal.emit('hhhhhhhhh')
+
+    return decorated
+
+
 class DataPreprocessUI(QWidget):
+    status_signal = pyqtSignal(str)
+
     def __init__(self, parent=None):
         self.patient_id = ''
         self.pic_path = ''
@@ -140,11 +158,13 @@ class DataPreprocessUI(QWidget):
             self.show_loading_info_lb.append('')
             self.show_loading_info_lb.append('数据未加载')
 
+    # @show_status_decorator
     def select_patient(self):
+        print(111111111111111)
+        self.status_signal.emit('正在加载病人数据...')
         patient_id = self.patient_cb.currentText()
         self.patient_id = patient_id
         try:
-            print(11111111)
             cur = conn.cursor()
             print(patient_id)
             print(type(patient_id))
@@ -158,11 +178,11 @@ class DataPreprocessUI(QWidget):
             conn.commit()
             data = cur.fetchone()
             print('data:', data)
-            patient_data_path = data[1]
-            static_start = data[2]
-            static_end = data[3]
-            self.n_channels = data[4]
-            self.pic_path = data[5]
+            patient_data_path = data[2]
+            static_start = data[3]
+            static_end = data[4]
+            self.n_channels = data[5]
+            self.pic_path = data[6]
             cur.close()
             conn.close()
         except Exception as e:
@@ -176,16 +196,17 @@ class DataPreprocessUI(QWidget):
             self.raw_data.filter(1, 249)
             self.raw_data.notch_filter((50, 100, 150, 200))
             print(type(self.raw_data))
-            QMessageBox.information(self, '消息', '数据加载完成', QMessageBox.Ok)
         else:
             print('数据未加载')
-        print('33333333333')
         self.start_time.setText(str(static_start))
         self.end_time.setText(str(static_end))
         self.n_channels_QL.setText(str(self.n_channels))
+        self.status_signal.emit('就绪！')
 
+    # @show_status_decorator
     def get_static_signal(self):
         print(11111111)
+        self.status_signal.emit('正在截取静息态数据...')
         self.show_data_path(self.data_path)
         if not self.raw_data:
             QMessageBox.information(self, '消息', '请先加载数据', QMessageBox.Ok)
@@ -204,14 +225,17 @@ class DataPreprocessUI(QWidget):
             self.show_loading_info_lb.append('静息态数据截取: 起始时间:%ss,结束时间:%ss    完成！' %(start_time, end_time))
             self.static_signal = static_data
             print(static_data.shape)
+            self.status_signal.emit('就绪！')
             return
         else:
             QMessageBox.information(self, '消息', '请输入正确的起始时间和结束时间', QMessageBox.Ok)
+            self.status_signal.emit('static_time_error...')
 
     def feature_extract(self):
         # if not self.static_signal:  # 加上这三句代码会报错，不知道为啥。。。
         #     print('ssssssss')
         #     return
+        self.status_signal.emit('正在进行特征提取...')
         self.show_loading_info_lb.append('')
         self.show_loading_info_lb.append('预处理:基线漂移矫正    完成！')
         self.show_loading_info_lb.append('')
@@ -270,6 +294,7 @@ class DataPreprocessUI(QWidget):
             my_eng = my_eng / sum(my_eng)
             self.feature_sample.append(my_eng)
         self.show_loading_info_lb.append('')
+        self.status_signal.emit('就绪！')
         self.show_loading_info_lb.append('特征提取:使用db3小波，六层小波分解，提取七个子频带的能量占比作为特征    完成！')
         print(self.feature_sample)
         return self.feature_sample
@@ -285,4 +310,6 @@ if __name__ == '__main__':
     # tree.show_data_path('sjggggggghhhjjgh')
     # tree.feature_extract()
     sys.exit(app.exec_())
+
+
 

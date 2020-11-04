@@ -24,7 +24,7 @@ class BorderMapIntro(QWidget):
         # }
         html = '''
             <font size = 4><font size = 5 color = blue><b><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
-            &nbsp;&nbsp;功能区边界定位图部分</div></b></font><p>\
+            &nbsp;&nbsp;功能区边界聚类算法部分</div></b></font><p>\
             这里是整个系统的第一部分，这部分的主要功能是首先对输入的脑电信号进行预处理和特征提取操作，接着使用聚类模型识别电极属性\
             ，最后在电极分布图上画出功能区边界定位图。这部分的主要内容由以下几个步骤组成：<p>\
             <font size = 4><b>1.导入数据:</b></font>处理数据的第一步操作，选择要处理的数据并导入。<br/><br/>\

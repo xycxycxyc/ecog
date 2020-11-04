@@ -24,7 +24,7 @@ class FunctionMapIntro(QWidget):
         # }
         html = '''
             <font size = 4><font size = 5 color = blue><b><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
-            &nbsp;&nbsp;功能区地形图部分</div></b></font><p>\
+            &nbsp;&nbsp;基于聚类和分类的功能定位部分</div></b></font><p>\
             这里是整个系统的第三部分，这部分的主要内容是利用前两个部分分别生成的功能区边界定位图和功能区属性定位图合成最终的\
             功能区地形图。这部的主要内容包括以下几个步骤：<p>\
             <font size = 4><b>1.功能区地形图:</b></font>利用前两步得到的边界定位图和属性定位图结合对应的合成算法，得到功能区地形图。\

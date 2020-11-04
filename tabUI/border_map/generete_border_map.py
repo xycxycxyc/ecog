@@ -7,7 +7,7 @@
 
 import sys
 import os
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QCheckBox, QVBoxLayout, QPushButton, QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap
 import cv2
@@ -16,6 +16,8 @@ import json
 
 
 class GenerateBorderMap(QWidget):
+    status_signal = pyqtSignal(str)
+
     def __init__(self, parent=None):
         super(GenerateBorderMap, self).__init__(parent)
         self.show_border_map_bt = QPushButton()
@@ -73,6 +75,7 @@ class GenerateBorderMap(QWidget):
         print(self.result_list)
 
     def plot_border_map(self):
+        self.status_signal.emit('正在绘制边界图...')
         if len(self.result_list) == 0:
             QMessageBox.warning(self, '警告', '请先生成聚类结果', QMessageBox.Ok)
             return False
@@ -212,6 +215,7 @@ class GenerateBorderMap(QWidget):
                             img[j, i] = my_interpolation(i, j, color_map[index], electrode_list)
 
         cv2.imwrite("border_map.jpg", img)
+        self.status_signal.emit('就绪！')
 
 
 if __name__ == '__main__':

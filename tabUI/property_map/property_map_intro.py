@@ -24,7 +24,7 @@ class PropertyMapIntro(QWidget):
         # }
         html = '''
             <font size = 4><font size = 5 color = blue><b><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
-            &nbsp;&nbsp;功能区属性定位图部分</div></b></font><p>\
+            &nbsp;&nbsp;功能区属性分类算法部分</div></b></font><p>\
             这里是整个系统的第二部分，这部分的主要内容是根据经典的解剖学定位图，结合和脑皮质的主要沟回确\
             定功能区的在脑皮质的相对位置，接着使用图像处理的方法标记出不同属性的功能区边界。得到功能区属性定位图。\
             这部分的主要内容由以下几个步骤组成：<p>\

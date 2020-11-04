@@ -7,11 +7,13 @@
 
 import sys
 from sklearn.cluster import AgglomerativeClustering
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QCheckBox, QVBoxLayout, QMessageBox, QPushButton, QTextEdit
 
 
 class ClusterUI(QWidget):
+    status_signal = pyqtSignal(str)
+
     def __init__(self, parent=None):
         self.feature_sample = None
         super(ClusterUI, self).__init__(parent)
@@ -52,6 +54,7 @@ class ClusterUI(QWidget):
 
     def cluster(self):
         # 层次聚类
+        self.status_signal.emit('正在聚类...')
         ac = AgglomerativeClustering(n_clusters=4, affinity="euclidean", linkage="ward")
         print('self.feature_sample:', self.feature_sample)
 
@@ -90,6 +93,7 @@ class ClusterUI(QWidget):
             mystr1 = mylist1[i] + mystr[0:-1]
             print(mystr1)
             self.cluster_result_lb.append(mystr1)
+            self.status_signal.emit('就绪！')
 
     def trans_result_list(self):
         print(self.result_list)
